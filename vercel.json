@@ -1,7 +1,9 @@
-
 {
   "rewrites": [
-    { "source": "/((?!api/.*).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/.*).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
@@ -22,5 +24,8 @@
         }
       ]
     }
-  ]
+  ],
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
+  "framework": "vite"
 }
