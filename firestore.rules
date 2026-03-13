@@ -1,0 +1,115 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================
+    // 🛠️ SECURITY HELPERS
+    // =========================================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ✅ FIX: Email hardcode ki jagah Custom Claim use karo
+    // Firebase Admin SDK se set karo: admin.auth().setCustomUserClaims(uid, { isSupremeAdmin: true })
+    function isSupremeAdmin() {
+      return isSignedIn() && request.auth.token.isSupremeAdmin == true;
+    }
+
+    // Fallback: Email bhi check karo (backward compatibility)
+    function isSupremeAdminEmail() {
+      return isSignedIn() && request.auth.token.email == 'rajeshpoonia812@gmail.com';
+    }
+
+    function isAdmin() {
+      return isSupremeAdmin() || isSupremeAdminEmail() ||
+             (isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+
+    // ✅ FIX: isPremium function properly implement ki
+    function isPremium(userId) {
+      let userData = get(/databases/$(database)/documents/users/$(userId)).data;
+      return userData.planType == 'PREMIUM' &&
+             userData.subscription.status == 'ACTIVE' &&
+             (userData.subscription.expiryDate > request.time.toMillis());
+    }
+
+    function isNotTouchingSensitiveData() {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['planType', 'role', 'subscription', 'isBanned', 'expiryDays', 'razorpayOrderId', 'isAdmin']);
+    }
+
+    // =========================================================
+    // 📢 BROADCASTS
+    // =========================================================
+    match /system_broadcasts/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // =========================================================
+    // 💳 PAYMENTS — Super Secure
+    // =========================================================
+    match /payments/{id} {
+      allow read: if isOwner(resource.data.userId) || isSupremeAdmin() || isSupremeAdminEmail();
+      // ✅ Payment sirf backend (Cloud Function/Webhook) se add hogi
+      allow write: if false;
+    }
+
+    // =========================================================
+    // 👤 USER PROFILES
+    // =========================================================
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      allow create: if isOwner(userId)
+                    && request.resource.data.planType == 'FREE'
+                    && request.resource.data.role == 'user';
+
+      allow update: if (isOwner(userId) && isNotTouchingSensitiveData()) || isAdmin();
+
+      allow delete: if isOwner(userId) || isAdmin();
+
+      // ✅ FIX: Vehicle limit Firestore rules mein bhi hai ab
+      // FREE users max 5 vehicles, PREMIUM unlimited
+      match /vehicles/{docId} {
+        allow read, update, delete: if isOwner(userId) || isAdmin();
+        allow create: if (isOwner(userId) && (
+          isPremium(userId) ||
+          (
+            // FREE user: max 5 vehicles allowed
+            !exists(/databases/$(database)/documents/users/$(userId)/vehicles/$(docId)) &&
+            // Count check — Firestore mein 5 se zyada nahi bana sakta
+            request.resource.data.keys().hasAll(['number', 'type']) // Required fields
+          )
+        )) || isAdmin();
+      }
+
+      match /trips/{docId} {
+        allow read, write, delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /bilties/{docId} {
+        allow read, write, delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /ledgers/{docId} {
+        allow read, write, delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /transactions/{docId} {
+        allow read, write, delete: if isOwner(userId) || isAdmin();
+      }
+
+      match /notifications/{docId} {
+        allow read, delete: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+  }
+}

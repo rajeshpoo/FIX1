@@ -1,0 +1,55 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbar Hiding */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Mobile Optimizations */
+html, body {
+  overflow-x: hidden; /* Prevents horizontal scrolling/swiping of the entire app */
+  /* Safe Area Handling for Notch Devices */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  /* Keyboard/Viewport Fix: Use Dynamic Viewport Height */
+  min-height: 100dvh;
+}
+
+body { 
+  /* Removes 300ms tap delay */
+  touch-action: manipulation; 
+  -webkit-tap-highlight-color: transparent; 
+  /* Native App Feel: Prevent rubber-band bouncing */
+  overscroll-behavior-y: none;
+  user-select: none; 
+}
+
+/* Explicit Safe Area Utilities if needed separately */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+input, textarea { user-select: text; }
+
+/* Custom Classes - PERFORMANCE OPTIMIZED BLUR */
+.glass-header {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+}
+
+/* Safe Area for Notch Devices */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

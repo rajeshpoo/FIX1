@@ -1,0 +1,50 @@
+{
+  "name": "fleetdost",
+  "private": true,
+  "version": "1.4.6",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "firebase": "10.13.2",
+    "lucide-react": "^0.475.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "xlsx": "^0.18.5",
+    "@google/genai": "^1.34.0",
+    "pizzip": "^3.1.5",
+    "docxtemplater": "^3.44.0",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/preferences": "^6.0.0",
+    "@capacitor-community/speech-recognition": "^6.0.0",
+    "@capacitor-community/text-to-speech": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/keyboard": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.2.0",
+    "vite": "^5.1.0",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "@types/file-saver": "^2.0.7",
+    "@capacitor/cli": "^6.0.0",
+    "firebase-admin": "^12.0.0",
+    "razorpay": "^2.9.2"
+  },
+  "comment_server_packages": "firebase-admin and razorpay are used in api/ (Vercel serverless) only"
+}
